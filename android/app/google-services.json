@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "259471698708",
+    "project_id": "taskmates-7281b",
+    "storage_bucket": "taskmates-7281b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:259471698708:android:9916b45e990e3434133001",
+        "android_client_info": {
+          "package_name": "com.example.taskmates"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCdue4wPm-RIsKpAJ_3J-bB1mJw74xhqE0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
