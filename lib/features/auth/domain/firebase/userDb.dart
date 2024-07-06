@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:taskmates/features/auth/data/user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:taskmates/features/auth/presentation/provider/userProvider.dart';
 
 abstract class UserDb {
   Future<UserModel?> singUp(UserModel u);

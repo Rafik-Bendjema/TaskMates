@@ -20,9 +20,9 @@ class UserModel {
   }
 
   // Factory method to create a User instance from JSON
-  factory UserModel.fromJson(Map<String, dynamic> json) {
+  factory UserModel.fromJson(String uid, Map<String, dynamic> json) {
     return UserModel(
-      firebaseId: json['firebaseId'],
+      firebaseId: uid,
       id: json['id'],
       email: json['email'],
       pwd: json['pwd'],

@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:taskmates/core/widgets/background.dart';
-import 'package:taskmates/features/auth/data/user.dart';
 import 'package:taskmates/features/auth/domain/firebase/userDb.dart';
 import 'package:taskmates/features/auth/presentation/pages/decider.dart';
 import 'package:taskmates/features/auth/presentation/provider/userProvider.dart';

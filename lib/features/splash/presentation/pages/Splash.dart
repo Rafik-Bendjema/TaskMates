@@ -1,10 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:taskmates/core/widgets/background.dart';
-import 'package:taskmates/features/auth/presentation/pages/Signin.dart';
-import 'package:taskmates/features/auth/presentation/pages/Singup.dart';
 import 'package:taskmates/features/auth/presentation/pages/decider.dart';
 
 class Splash extends StatefulWidget {
@@ -15,6 +11,7 @@ class Splash extends StatefulWidget {
 }
 
 class _SplashState extends State<Splash> {
+  bool isDone = false;
   @override
   void initState() {
     waiter();
@@ -22,7 +19,7 @@ class _SplashState extends State<Splash> {
   }
 
   void waiter() async {
-    await Future.delayed(const Duration(seconds: 3));
+    await Future.delayed(const Duration(seconds: 2));
     if (mounted) {
       Navigator.pushReplacement(
         context,
@@ -35,20 +32,24 @@ class _SplashState extends State<Splash> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: const Color(0XFF8EE18E),
-        body: Stack(
-          children: [
-            background(context),
-            const Center(
-              child: Text(
-                "TaskMates",
-                style: TextStyle(
-                    fontFamily: 'Kalam',
-                    fontWeight: FontWeight.w700,
-                    fontSize: 30,
-                    color: Colors.white),
-              ),
-            )
-          ],
+        body: Consumer(
+          builder: (c, ref, _) {
+            return Stack(
+              children: [
+                background(context),
+                const Center(
+                  child: Text(
+                    "TaskMates",
+                    style: TextStyle(
+                        fontFamily: 'Kalam',
+                        fontWeight: FontWeight.w700,
+                        fontSize: 30,
+                        color: Colors.white),
+                  ),
+                )
+              ],
+            );
+          },
         ));
   }
 }

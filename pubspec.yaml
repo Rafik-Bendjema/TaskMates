@@ -41,6 +41,7 @@ dependencies:
   cloud_firestore: 
   flutter_riverpod: 
   riverpod_annotation: 
+  uuid: 
   
 
 dev_dependencies:

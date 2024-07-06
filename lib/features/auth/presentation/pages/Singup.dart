@@ -1,9 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:taskmates/core/widgets/background.dart';
 import 'package:taskmates/features/auth/data/user.dart';
 import 'package:taskmates/features/auth/domain/firebase/userDb.dart';
-import 'package:taskmates/features/auth/presentation/pages/Signin.dart';
 
 class Signup extends StatefulWidget {
   const Signup({super.key});
