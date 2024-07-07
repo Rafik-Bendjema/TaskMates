@@ -71,7 +71,7 @@ class _TaskPageState extends ConsumerState<TaskPage> {
                       TaskDone(
                         tasks: doneTasks,
                       ),
-                      Taskview(tasks: waitingTasks)
+                      TaskView(tasks: waitingTasks)
                     ],
                   ),
                 )

@@ -14,8 +14,21 @@ class TaskDb_impl extends Taskdb {
   var db = FirebaseFirestore.instance;
   @override
   Future<Task?> createTask(Task t) async {
-    // TODO: implement deleteTask
-    throw UnimplementedError();
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return null;
+    try {
+      await db
+          .collection('users')
+          .doc(uid)
+          .collection('tasks')
+          .doc(t.id)
+          .set(t.toMap());
+      return t;
+    } catch (e) {
+      print("here is the error ${e.toString()}");
+      return null;
+    }
+    return null;
   }
 
   @override
@@ -25,9 +38,21 @@ class TaskDb_impl extends Taskdb {
   }
 
   @override
-  Future<Task?> editTask(Task t) {
-    // TODO: implement editTask
-    throw UnimplementedError();
+  Future<Task?> editTask(Task t) async {
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return null;
+    try {
+      await db
+          .collection('users')
+          .doc(uid)
+          .collection('tasks')
+          .doc(t.id)
+          .update({'done': t.isDone});
+      return t;
+    } catch (e) {
+      print('error');
+      return null;
+    }
   }
 
   @override

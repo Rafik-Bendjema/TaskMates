@@ -1,9 +1,14 @@
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:duration_picker/duration_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:intl/intl.dart';
+import 'package:taskmates/features/home/presentation/pages/home.dart';
+import 'package:taskmates/features/tasks/data/task.dart';
+import 'package:taskmates/features/tasks/domain/taskDb.dart';
 
 class Addtask extends StatefulWidget {
   const Addtask({super.key});
@@ -13,11 +18,50 @@ class Addtask extends StatefulWidget {
 }
 
 class _AddtaskState extends State<Addtask> {
+  bool dateError = false;
+  void _submit() async {
+    if (_formKey.currentState!.validate()) {
+      if (date == null) {
+        setState(() {
+          dateError = true;
+        });
+      } else {
+        Taskdb taskdb = TaskDb_impl();
+        Task t = Task(
+            title: _titleController.text,
+            date: date!,
+            duration: duration,
+            isDone: false,
+            color: color.value);
+        Task? res = await taskdb.createTask(t);
+        if (res != null) {
+          Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => const HomePage()));
+        } else {
+          showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                    title: const Text("Error adding a task"),
+                    content:
+                        const Text("error happen when trying to add a task "),
+                    actions: [
+                      TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('Back'))
+                    ],
+                  ));
+        }
+      }
+    }
+  }
+
   final _formKey = GlobalKey<FormState>();
 
   final _titleController = TextEditingController();
   final _noteController = TextEditingController();
-  String? coTask;
+  String coTask = "";
   DateTime? date;
   Duration? duration;
   Color color = Colors.blue;
@@ -133,9 +177,11 @@ class _AddtaskState extends State<Addtask> {
                     ))
               ],
             ),
-            const SizedBox(
-              height: 10,
-            ),
+            if (dateError)
+              const Text(
+                'you need to choose a date',
+                style: TextStyle(color: Colors.red),
+              ),
             const SizedBox(
               height: 10,
             ),
@@ -243,9 +289,7 @@ class _AddtaskState extends State<Addtask> {
                           10), // Change this value to customize the shape
                     )),
                 onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    // Process data.
-                  }
+                  _submit();
                 },
                 child: const Text(
                   "Submit",
