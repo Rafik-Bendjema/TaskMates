@@ -57,6 +57,7 @@ final tasksProvider = StreamProvider<List<Task>>((ref) {
       .collection('users')
       .doc(user.uid)
       .collection('tasks')
+      .orderBy('creationDate')
       .snapshots()
       .map((snapshot) => snapshot.docs.map((doc) {
             return Task.fromMap(doc.data());

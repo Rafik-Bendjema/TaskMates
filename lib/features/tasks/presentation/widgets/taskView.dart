@@ -28,15 +28,18 @@ class _TaskViewState extends State<TaskView> {
               },
               onHorizontalDragEnd: (details) async {
                 if (_dragExtent > 20) {
+                  setState(() {
+                    _dragExtent = 0.0;
+                  });
                   print('Delete ${task.title}');
                   Taskdb taskdb = TaskDb_impl();
                   task.isDone = !task.isDone;
                   await taskdb.editTask(task);
+                } else {
+                  setState(() {
+                    _dragExtent = 0.0;
+                  });
                 }
-                // Reset drag extent
-                /*  setState(() {
-                  _dragExtent = 0.0;
-                });*/
               },
               child: Transform.translate(
                 offset: Offset(_dragExtent, 0),

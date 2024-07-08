@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:taskmates/features/home/presentation/widgets/TaskTile.dart';
 import 'package:taskmates/features/tasks/data/task.dart';
 
+import '../../../tasks/domain/taskDb.dart';
+
 class TaskDone extends ConsumerStatefulWidget {
   final List<Task> tasks;
 
@@ -15,6 +17,8 @@ class TaskDone extends ConsumerStatefulWidget {
 
 class _TaskDoneState extends ConsumerState<TaskDone>
     with SingleTickerProviderStateMixin {
+  double _dragExtent = 0.0;
+
   late List<Task> tasks;
 
   @override
@@ -60,11 +64,40 @@ class _TaskDoneState extends ConsumerState<TaskDone>
                   Column(
                     children: [
                       Column(
-                        children: tasks.map((task) {
-                          return TaskTile(
-                            Color(task.color),
-                            task.title,
-                            task.coTask,
+                        children: widget.tasks.map((task) {
+                          return StatefulBuilder(
+                            builder: (context, setState) {
+                              return GestureDetector(
+                                onHorizontalDragUpdate: (details) {
+                                  setState(() {
+                                    _dragExtent = details.primaryDelta! + 20;
+                                  });
+                                },
+                                onHorizontalDragEnd: (details) async {
+                                  if (_dragExtent > 20) {
+                                    setState(() {
+                                      _dragExtent = 0.0;
+                                    });
+                                    print('Delete ${task.title}');
+                                    Taskdb taskdb = TaskDb_impl();
+                                    task.isDone = !task.isDone;
+                                    await taskdb.editTask(task);
+                                  } else {
+                                    setState(() {
+                                      _dragExtent = 0.0;
+                                    });
+                                  }
+                                },
+                                child: Transform.translate(
+                                  offset: Offset(_dragExtent, 0),
+                                  child: TaskTile(
+                                    Color(task.color),
+                                    task.title,
+                                    task.coTask,
+                                  ),
+                                ),
+                              );
+                            },
                           );
                         }).toList(),
                       ),

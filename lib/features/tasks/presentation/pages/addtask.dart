@@ -32,7 +32,8 @@ class _AddtaskState extends State<Addtask> {
             date: date!,
             duration: duration,
             isDone: false,
-            color: color.value);
+            color: color.value,
+            creationDate: DateTime.now());
         Task? res = await taskdb.createTask(t);
         if (res != null) {
           Navigator.of(context).pushReplacement(

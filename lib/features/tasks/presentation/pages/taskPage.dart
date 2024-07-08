@@ -23,13 +23,21 @@ class _TaskPageState extends ConsumerState<TaskPage> {
     return tasks.when(
       data: (data) {
         print("here is data ${data.length}");
+
         List<Task> doneTasks = [];
+        List<Task> todaysTasks = [];
+
         List<Task> waitingTasks = [];
         for (Task task in data) {
-          if (task.isDone) {
-            doneTasks.add(task);
-          } else {
-            waitingTasks.add(task);
+          if (task.date.day == DateTime.now().day &&
+              task.date.year == DateTime.now().year &&
+              task.date.month == DateTime.now().month) {
+            todaysTasks.add(task);
+            if (task.isDone) {
+              doneTasks.add(task);
+            } else {
+              waitingTasks.add(task);
+            }
           }
         }
         if (addClicked) return const Addtask();
@@ -41,22 +49,20 @@ class _TaskPageState extends ConsumerState<TaskPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text("Today"),
-                    Text("${doneTasks.length}/${data.length}")
+                    Text("${doneTasks.length}/${todaysTasks.length}")
                   ],
                 ),
                 const SizedBox(
                   height: 20,
                 ),
-                Stack(
+                const Stack(
                   children: [
-                    const Divider(
+                    Divider(
                       thickness: 3,
                     ),
                     Divider(
                       color: Colors.green,
-                      endIndent: (MediaQuery.of(context).size.width -
-                              50 * doneTasks.length) /
-                          data.length,
+                      endIndent: 0,
                       thickness: 3,
                     ),
                   ],
