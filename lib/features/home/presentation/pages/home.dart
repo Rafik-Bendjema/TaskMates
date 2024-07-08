@@ -1,3 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -45,26 +48,230 @@ class _HomePageState extends State<HomePage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Row(
-                              children: [
-                                Container(
-                                    padding: const EdgeInsets.all(8),
-                                    margin: const EdgeInsets.all(8),
-                                    decoration: const BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: Colors.white),
-                                    child: const Icon(Icons.person)),
-                                Consumer(
-                                  builder: (context, ref, w) {
-                                    UserModel? user = ref.watch(userIdProvider);
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                      padding: const EdgeInsets.all(8),
+                                      margin: const EdgeInsets.all(8),
+                                      decoration: const BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Colors.white),
+                                      child: const Icon(Icons.person)),
+                                  Consumer(
+                                    builder: (context, ref, w) {
+                                      UserModel? user =
+                                          ref.watch(userIdProvider);
 
-                                    return Text(user?.id ?? '...');
+                                      return Text(user?.id ?? '...');
+                                    },
+                                  )
+                                ],
+                              ),
+                              TextButton(
+                                  onPressed: () async {
+                                    await FirebaseAuth.instance.signOut();
                                   },
-                                )
-                              ],
-                            ),
+                                  child: const Text(
+                                    "LOGOUT",
+                                  )),
+                              StreamBuilder(
+                                stream: FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                                    .snapshots(),
+                                builder: (BuildContext context,
+                                    AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                  int invitationCount = 0;
+
+                                  if (snapshot.hasError) {
+                                    return IconButton(
+                                      onPressed: () {},
+                                      icon: const Stack(
+                                        clipBehavior: Clip.none,
+                                        children: [
+                                          Icon(Icons.notifications),
+                                          Positioned(
+                                            bottom: -6,
+                                            right: 0,
+                                            child: Text(
+                                              '!',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 15,
+                                                color: Colors.red,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }
+
+                                  if (snapshot.connectionState ==
+                                          ConnectionState.active &&
+                                      snapshot.data != null &&
+                                      snapshot.data!.exists) {
+                                    var data = snapshot.data!.data()
+                                        as Map<String, dynamic>;
+                                    if (data.containsKey('invitation')) {
+                                      List<dynamic> invitations =
+                                          data['invitation'];
+                                      invitationCount = invitations.length;
+                                    }
+                                  }
+
+                                  return IconButton(
+                                    onPressed: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) => Dialog(
+                                          child: SizedBox(
+                                            width: 200,
+                                            height: 500,
+                                            child: Column(
+                                              children: [
+                                                const SizedBox(height: 20),
+                                                const Text(
+                                                  'Invitations',
+                                                  style: TextStyle(
+                                                    fontSize: 20,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 20),
+                                                Expanded(
+                                                  child: StreamBuilder(
+                                                    stream: FirebaseFirestore
+                                                        .instance
+                                                        .collection('users')
+                                                        .doc(FirebaseAuth
+                                                            .instance
+                                                            .currentUser!
+                                                            .uid)
+                                                        .snapshots(),
+                                                    builder: (BuildContext
+                                                            context,
+                                                        AsyncSnapshot<
+                                                                DocumentSnapshot>
+                                                            snapshot) {
+                                                      if (snapshot.hasError) {
+                                                        return Center(
+                                                            child: Text(
+                                                                'Error: ${snapshot.error}'));
+                                                      }
+
+                                                      if (snapshot
+                                                              .connectionState ==
+                                                          ConnectionState
+                                                              .waiting) {
+                                                        return const Center(
+                                                            child:
+                                                                CircularProgressIndicator());
+                                                      }
+
+                                                      List<dynamic>
+                                                          invitations = [];
+
+                                                      if (snapshot
+                                                          .data!.exists) {
+                                                        var data = snapshot
+                                                                .data!
+                                                                .data()
+                                                            as Map<String,
+                                                                dynamic>;
+                                                        if (data.containsKey(
+                                                            'invitation')) {
+                                                          invitations = data[
+                                                              'invitation'];
+                                                        }
+                                                      }
+
+                                                      if (invitations.isEmpty) {
+                                                        return const Center(
+                                                            child: Text(
+                                                                'No invitations found.'));
+                                                      }
+
+                                                      return Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(13),
+                                                        child: ListView.builder(
+                                                          itemCount: invitations
+                                                              .length,
+                                                          itemBuilder:
+                                                              (BuildContext
+                                                                      context,
+                                                                  int index) {
+                                                            return Expanded(
+                                                              child: Container(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(8),
+                                                                decoration: const BoxDecoration(
+                                                                    borderRadius:
+                                                                        BorderRadius.all(Radius.circular(
+                                                                            10)),
+                                                                    color: Color
+                                                                        .fromARGB(
+                                                                            255,
+                                                                            229,
+                                                                            229,
+                                                                            229)),
+                                                                child: Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .spaceBetween,
+                                                                  children: [
+                                                                    Text(invitations[
+                                                                        index]),
+                                                                    TextButton(
+                                                                        onPressed:
+                                                                            () {},
+                                                                        child: const Text(
+                                                                            "accept"))
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            );
+                                                          },
+                                                        ),
+                                                      );
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    icon: Stack(
+                                      clipBehavior: Clip.none,
+                                      children: [
+                                        const Icon(Icons.notifications),
+                                        if (invitationCount > 0)
+                                          Positioned(
+                                            bottom: -6,
+                                            right: 0,
+                                            child: Text(
+                                              '$invitationCount',
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 15,
+                                                color: Colors.red,
+                                              ),
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              )
+                            ],
                           ),
                           const Align(
                             alignment: Alignment.centerLeft,

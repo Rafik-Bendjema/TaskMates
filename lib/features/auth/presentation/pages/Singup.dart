@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:taskmates/core/widgets/background.dart';
 import 'package:taskmates/features/auth/data/user.dart';
 import 'package:taskmates/features/auth/domain/firebase/userDb.dart';
+import 'package:taskmates/features/auth/presentation/pages/Signin.dart';
 
 class Signup extends StatefulWidget {
   const Signup({super.key});
@@ -63,6 +64,10 @@ class _SignupState extends State<Signup> {
           email: _emailController.text,
           pwd: _pwdController.text);
       UserModel? result = await userDb.singUp(u);
+      if (result != null) {
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (context) => const Signin()));
+      }
     }
   }
 

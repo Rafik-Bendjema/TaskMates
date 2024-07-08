@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:taskmates/core/widgets/background.dart';
 import 'package:taskmates/features/auth/domain/firebase/userDb.dart';
+import 'package:taskmates/features/auth/presentation/pages/Singup.dart';
 import 'package:taskmates/features/auth/presentation/pages/decider.dart';
 import 'package:taskmates/features/auth/presentation/provider/userProvider.dart';
 
@@ -112,6 +113,13 @@ class _SigninState extends State<Signin> {
                         child: const Text('Submit'),
                       ),
                     ),
+                    TextButton(
+                      child: const Text('SIGN UP '),
+                      onPressed: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => const Signup()));
+                      },
+                    )
                   ],
                 ),
               ),

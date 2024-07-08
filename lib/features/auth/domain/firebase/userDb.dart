@@ -1,13 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:taskmates/features/auth/data/user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:taskmates/features/auth/presentation/provider/userProvider.dart';
 
 abstract class UserDb {
   Future<UserModel?> singUp(UserModel u);
   Future<String?> singIn(String email, String pwd);
+  Future<String?> addFriend(String id, WidgetRef ref);
 }
 
 class UserDbImpl extends UserDb {
+  FirebaseFirestore db = FirebaseFirestore.instance;
   @override
   Future<String?> singIn(String email, String pwd) async {
     try {
@@ -59,5 +63,47 @@ class UserDbImpl extends UserDb {
       print(e);
     }
     return null;
+  }
+
+  @override
+  Future<String> addFriend(String id, WidgetRef ref) async {
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return "No user is connected.";
+
+    UserModel? currentUser = ref.read(userIdProvider);
+    if (currentUser == null) {
+      return "User not found.";
+    }
+
+    if (currentUser.id == id) {
+      return "It's you, dummy!";
+    }
+
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('id', isEqualTo: id)
+          .get();
+
+      if (querySnapshot.size == 0) {
+        return "User not found.";
+      }
+      var mydoc = await db.collection('users').doc(uid).get();
+      List<String>? invitaion =
+          (mydoc.data() as Map<String, dynamic>)['invitaion'] as List<String>?;
+      if (invitaion != null && invitaion.contains(uid)) {
+        //here add friend later
+      }
+      DocumentSnapshot doc = querySnapshot.docs.first;
+
+      await doc.reference.update({
+        'invitation': FieldValue.arrayUnion([currentUser.id])
+      });
+
+      return "Invitation sent.";
+    } catch (e) {
+      print("Error adding friend: $e");
+      return "Error sending invitation.";
+    }
   }
 }
