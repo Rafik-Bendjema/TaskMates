@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taskmates/features/home/presentation/widgets/TaskTile.dart';
+import 'package:taskmates/features/tasks/presentation/widgets/TaskTile.dart';
 import 'package:taskmates/features/tasks/data/task.dart';
 
-import '../../../tasks/domain/taskDb.dart';
+import '../../domain/taskDb.dart';
 
 class TaskDone extends ConsumerStatefulWidget {
   final List<Task> tasks;

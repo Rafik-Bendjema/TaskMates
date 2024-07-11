@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:taskmates/features/auth/domain/firebase/userDb.dart';
+import 'package:taskmates/features/friends/presentation/pages/friendsList.dart';
 
 class FriendsPage extends StatefulWidget {
   const FriendsPage({super.key});
@@ -58,7 +59,7 @@ class _FriendsPageState extends State<FriendsPage> {
                     if (_controller.text.isNotEmpty) {
                       UserDb userDb = UserDbImpl();
 
-                      res = await userDb.addFriend(_controller.text, ref);
+                      res = await userDb.inviteFriend(_controller.text, ref);
                       if (res != null) {
                         setState(() {
                           res = res;
@@ -70,15 +71,17 @@ class _FriendsPageState extends State<FriendsPage> {
                 ),
               ),
             ),
-
-            //FriendsList()
           ],
         ),
         if (res != null)
           Text(
             res!,
             style: const TextStyle(color: Colors.red),
-          )
+          ),
+        const SizedBox(
+          height: 20,
+        ),
+        const FriendsList()
       ],
     );
   }

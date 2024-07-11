@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:taskmates/features/tasks/presentation/pages/addtask.dart';
 
 import '../../../auth/presentation/provider/userProvider.dart';
-import '../../../home/presentation/widgets/TaskDone.dart';
+import '../widgets/TaskDone.dart';
 import '../../data/task.dart';
 import '../widgets/taskView.dart';
 
@@ -40,7 +40,11 @@ class _TaskPageState extends ConsumerState<TaskPage> {
             }
           }
         }
-        if (addClicked) return const Addtask();
+        if (addClicked) {
+          return Addtask(
+            isEditing: false,
+          );
+        }
         return Stack(
           children: [
             Column(

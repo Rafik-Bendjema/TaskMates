@@ -7,7 +7,8 @@ import 'package:taskmates/features/auth/presentation/provider/userProvider.dart'
 abstract class UserDb {
   Future<UserModel?> singUp(UserModel u);
   Future<String?> singIn(String email, String pwd);
-  Future<String?> addFriend(String id, WidgetRef ref);
+  Future<String?> inviteFriend(String id, WidgetRef ref);
+  Future<bool> acceptInvitation(String id, WidgetRef ref);
 }
 
 class UserDbImpl extends UserDb {
@@ -66,7 +67,7 @@ class UserDbImpl extends UserDb {
   }
 
   @override
-  Future<String> addFriend(String id, WidgetRef ref) async {
+  Future<String> inviteFriend(String id, WidgetRef ref) async {
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return "No user is connected.";
 
@@ -104,6 +105,42 @@ class UserDbImpl extends UserDb {
     } catch (e) {
       print("Error adding friend: $e");
       return "Error sending invitation.";
+    }
+  }
+
+  @override
+  Future<bool> acceptInvitation(String id, WidgetRef ref) async {
+    UserModel? currentUser = ref.read(userIdProvider);
+    if (currentUser == null) {
+      print("User not found.");
+      return false;
+    }
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return false;
+
+    try {
+      QuerySnapshot friendDoc =
+          await db.collection('users').where('id', isEqualTo: id).get();
+      if (friendDoc.size == 0) {
+        print('user not found');
+        return false;
+      }
+      String friendUid = friendDoc.docs.first.id;
+      print('this is the friend uid');
+      await db.collection('users').doc(uid).update({
+        'invitation': FieldValue.arrayRemove([id]),
+        'friends': FieldValue.arrayUnion([friendUid])
+      }).then((v) {
+        print("i am here");
+      });
+      await friendDoc.docs.first.reference.update({
+        'invitation': FieldValue.arrayRemove([currentUser.id]),
+        'friends': FieldValue.arrayUnion([uid])
+      });
+      return true;
+    } catch (e) {
+      print('error adding a friend ${e.toString()}');
+      return false;
     }
   }
 }

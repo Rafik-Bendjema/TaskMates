@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:taskmates/features/auth/data/user.dart';
 
+import '../../../friends/data/friends.dart';
 import '../../../tasks/data/task.dart';
 
 final userIdProvider = StateNotifierProvider<UseridNotifier, UserModel?>((ref) {
@@ -37,16 +38,35 @@ final userInfoProvider =
   return FirebaseFirestore.instance.collection('users').doc(userId).snapshots();
 });
 
-final friendsProvider =
-    StreamProvider.family<QuerySnapshot<Map<String, dynamic>>, String>(
-        (ref, userId) {
+final friendsProvider = StreamProvider<List<Friend>>((ref) {
+  String uid = FirebaseAuth.instance.currentUser!.uid;
+
   return FirebaseFirestore.instance
       .collection('users')
-      .doc(userId)
-      .collection('friends')
-      .snapshots();
-});
+      .doc(uid)
+      .snapshots()
+      .asyncMap((userDoc) async {
+    var data = userDoc.data() as Map<String, dynamic>;
+    List<String> friendIds =
+        data.containsKey('friends') ? List<String>.from(data['friends']) : [];
 
+    List<Friend> friends = await Future.wait(friendIds.map((friendId) async {
+      DocumentSnapshot friendDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(friendId)
+          .get();
+      var friendData = friendDoc.data() as Map<String, dynamic>;
+      QuerySnapshot tasksSnapshot =
+          await friendDoc.reference.collection('tasks').get();
+      List<Task> tasks = tasksSnapshot.docs
+          .map((doc) => Task.fromMap(doc.data() as Map<String, dynamic>))
+          .toList();
+      return Friend.fromSnapshot(friendDoc.id, friendData, tasks);
+    }).toList());
+
+    return friends;
+  });
+});
 final tasksProvider = StreamProvider<List<Task>>((ref) {
   User? user = FirebaseAuth.instance.currentUser;
   if (user == null) {

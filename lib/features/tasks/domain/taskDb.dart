@@ -28,13 +28,24 @@ class TaskDb_impl extends Taskdb {
       print("here is the error ${e.toString()}");
       return null;
     }
-    return null;
   }
 
   @override
-  Future<bool> deleteTask(Task t) {
-    // TODO: implement deleteTask
-    throw UnimplementedError();
+  Future<bool> deleteTask(Task t) async {
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return false;
+    try {
+      await db
+          .collection('users')
+          .doc(uid)
+          .collection('tasks')
+          .doc(t.id)
+          .delete();
+      return true;
+    } catch (e) {
+      print("error deleting doc ${e.toString()}");
+      return false;
+    }
   }
 
   @override
@@ -47,7 +58,7 @@ class TaskDb_impl extends Taskdb {
           .doc(uid)
           .collection('tasks')
           .doc(t.id)
-          .update({'done': t.isDone});
+          .set(t.toMap());
       return t;
     } catch (e) {
       print('error');

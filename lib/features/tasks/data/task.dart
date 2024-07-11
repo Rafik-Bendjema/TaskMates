@@ -2,7 +2,7 @@ import 'package:uuid/uuid.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Task {
-  late String id;
+  String? id;
   final String title;
   final DateTime date;
   late DateTime creationDate;
@@ -10,6 +10,7 @@ class Task {
   bool isDone;
   final int color;
   String? coTask;
+  final String notes;
 
   Task(
       {required this.title,
@@ -18,9 +19,13 @@ class Task {
       this.duration,
       required this.isDone,
       this.color = 4294198070,
-      required this.creationDate}) {
-    Uuid uuid = const Uuid();
-    id = uuid.v1();
+      required this.creationDate,
+      required this.notes,
+      this.id}) {
+    if (id == null) {
+      Uuid uuid = const Uuid();
+      id = uuid.v1();
+    }
   }
 
   factory Task.fromMap(Map<String, dynamic> data) {
@@ -30,6 +35,7 @@ class Task {
         duration: Duration(minutes: data['duration'] ?? 0),
         coTask: data['Co-task'],
         isDone: data['done'],
+        notes: data['notes'] ?? "",
         color: data['color'],
         creationDate: (data['creationDate'] as Timestamp).toDate())
       ..id = data['id'] ?? "null";
@@ -44,7 +50,8 @@ class Task {
       'duration': duration?.inMinutes,
       'Co-task': coTask,
       'done': isDone,
-      'color': color
+      'color': color,
+      'notes': notes
     };
   }
 }
