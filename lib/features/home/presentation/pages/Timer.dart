@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:taskmates/core/notification/notification.dart';
+import 'package:taskmates/features/home/presentation/pages/home.dart';
 import 'package:taskmates/features/tasks/data/task.dart';
 import 'package:countdown_progress_indicator/countdown_progress_indicator.dart';
+import 'package:taskmates/features/tasks/domain/taskDb.dart';
 
 class TimerScreen extends StatefulWidget {
   final Task task;
@@ -15,8 +17,6 @@ class TimerScreen extends StatefulWidget {
 class _TimerState extends State<TimerScreen> with WidgetsBindingObserver {
   final CountDownController countDownController = CountDownController();
   bool isRunning = true; // State to track whether the countdown is running
-  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
 
   @override
   void initState() {
@@ -24,17 +24,21 @@ class _TimerState extends State<TimerScreen> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
 
     // Initialize the local notifications plugin
-    const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-    const InitializationSettings initializationSettings =
-        InitializationSettings(android: initializationSettingsAndroid);
-    flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  Future<void> taskDone() async {
+    Taskdb taskdb = TaskDb_impl();
+    widget.task.isDone = true;
+    await taskdb.editTask(widget.task);
+    //dispose();
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => const HomePage()));
   }
 
   void handleTimeout() {
@@ -44,7 +48,11 @@ class _TimerState extends State<TimerScreen> with WidgetsBindingObserver {
               title: const Text("Time Done"),
               content: const Text("You done the task?"),
               actions: [
-                TextButton(onPressed: () {}, child: const Text("Yes")),
+                TextButton(
+                    onPressed: () async {
+                      await taskDone();
+                    },
+                    child: const Text("Yes")),
                 TextButton(
                     onPressed: () {
                       Navigator.pop(context);
@@ -135,8 +143,8 @@ class _TimerState extends State<TimerScreen> with WidgetsBindingObserver {
                   child: const Text("Restart"),
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                    // Handle the done action
+                  onPressed: () async {
+                    await taskDone();
                   },
                   child: const Text("Done"),
                 ),

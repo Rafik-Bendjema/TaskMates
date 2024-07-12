@@ -75,52 +75,59 @@ class _SigninState extends State<Signin> {
       body: Stack(
         children: [
           background(context),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const Text(
-                      "Sign In",
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _emailController,
-                      decoration: const InputDecoration(labelText: 'Email'),
-                      keyboardType: TextInputType.emailAddress,
-                      validator: _validateEmail,
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _pwdController,
-                      decoration: const InputDecoration(labelText: 'Password'),
-                      obscureText: true,
-                      validator: _validatePassword,
-                    ),
-                    const SizedBox(height: 16),
-                    Consumer(
-                      builder: (context, ref, _) => ElevatedButton(
-                        onPressed: () {
-                          _submit(ref);
-                        },
-                        child: const Text('Submit'),
+          Center(
+            child: Container(
+              margin: const EdgeInsets.all(8),
+              decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(10))),
+              padding: const EdgeInsets.all(20.0),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Text(
+                        "Sign In",
+                        style: TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
                       ),
-                    ),
-                    TextButton(
-                      child: const Text('SIGN UP '),
-                      onPressed: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const Signup()));
-                      },
-                    )
-                  ],
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _emailController,
+                        decoration: const InputDecoration(labelText: 'Email'),
+                        keyboardType: TextInputType.emailAddress,
+                        validator: _validateEmail,
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _pwdController,
+                        decoration:
+                            const InputDecoration(labelText: 'Password'),
+                        obscureText: true,
+                        validator: _validatePassword,
+                      ),
+                      const SizedBox(height: 16),
+                      Consumer(
+                        builder: (context, ref, _) => ElevatedButton(
+                          onPressed: () {
+                            _submit(ref);
+                          },
+                          child: const Text('Submit'),
+                        ),
+                      ),
+                      TextButton(
+                        child: const Text('SIGN UP '),
+                        onPressed: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => const Signup()));
+                        },
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),

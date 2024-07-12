@@ -27,7 +27,6 @@ class HeaderWidget extends StatelessWidget {
                     margin: const EdgeInsets.all(8),
                     decoration: const BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.white,
                     ),
                     child: const Icon(Icons.person),
                   ),
@@ -43,7 +42,9 @@ class HeaderWidget extends StatelessWidget {
                 onPressed: () async {
                   await FirebaseAuth.instance.signOut();
                 },
-                child: const Text("LOGOUT"),
+                child: const Row(
+                  children: [Text("Logout"), Icon(Icons.logout)],
+                ),
               ),
               const NotificationsWidget(),
             ],

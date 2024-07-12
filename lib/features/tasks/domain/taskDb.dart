@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:taskmates/features/tasks/data/task.dart';
 
 abstract class Taskdb {
@@ -14,6 +13,7 @@ class TaskDb_impl extends Taskdb {
   var db = FirebaseFirestore.instance;
   @override
   Future<Task?> createTask(Task t) async {
+    print("this is the co task ${t.coTask_id}  and the uid ${t.coTask}");
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return null;
     try {
@@ -23,6 +23,22 @@ class TaskDb_impl extends Taskdb {
           .collection('tasks')
           .doc(t.id)
           .set(t.toMap());
+      if (t.coTask != null) {
+        String id = await db
+            .collection('users')
+            .doc(uid)
+            .get()
+            .then((v) => (v.data() as Map<String, dynamic>)['id']);
+        String coTaskuid = t.coTask!;
+        t.coTask = uid;
+        t.coTask_id = id;
+        await db
+            .collection('users')
+            .doc(coTaskuid)
+            .collection('tasks')
+            .doc(t.id)
+            .set(t.toMap());
+      }
       return t;
     } catch (e) {
       print("here is the error ${e.toString()}");
@@ -41,6 +57,14 @@ class TaskDb_impl extends Taskdb {
           .collection('tasks')
           .doc(t.id)
           .delete();
+      if (t.coTask != null) {
+        await db
+            .collection('users')
+            .doc(t.coTask)
+            .collection('tasks')
+            .doc(t.id)
+            .delete();
+      }
       return true;
     } catch (e) {
       print("error deleting doc ${e.toString()}");
@@ -59,6 +83,22 @@ class TaskDb_impl extends Taskdb {
           .collection('tasks')
           .doc(t.id)
           .set(t.toMap());
+      if (t.coTask != null) {
+        String id = await db
+            .collection('users')
+            .doc(uid)
+            .get()
+            .then((v) => (v.data() as Map<String, dynamic>)['id']);
+        String coTaskuid = t.coTask!;
+        t.coTask = uid;
+        t.coTask_id = id;
+        await db
+            .collection('users')
+            .doc(coTaskuid)
+            .collection('tasks')
+            .doc(t.id)
+            .set(t.toMap());
+      }
       return t;
     } catch (e) {
       print('error');

@@ -17,17 +17,19 @@ class TaskPage extends ConsumerStatefulWidget {
 
 class _TaskPageState extends ConsumerState<TaskPage> {
   bool addClicked = false;
+
   @override
   Widget build(BuildContext context) {
     final tasks = ref.watch(tasksProvider);
+
     return tasks.when(
       data: (data) {
         print("here is data ${data.length}");
 
         List<Task> doneTasks = [];
         List<Task> todaysTasks = [];
-
         List<Task> waitingTasks = [];
+
         for (Task task in data) {
           if (task.date.day == DateTime.now().day &&
               task.date.year == DateTime.now().year &&
@@ -40,11 +42,15 @@ class _TaskPageState extends ConsumerState<TaskPage> {
             }
           }
         }
+
+        double progress = todaysTasks.isNotEmpty
+            ? doneTasks.length / todaysTasks.length
+            : 0.0;
+
         if (addClicked) {
-          return Addtask(
-            isEditing: false,
-          );
+          return Addtask(isEditing: false);
         }
+
         return Stack(
           children: [
             Column(
@@ -56,35 +62,29 @@ class _TaskPageState extends ConsumerState<TaskPage> {
                     Text("${doneTasks.length}/${todaysTasks.length}")
                   ],
                 ),
-                const SizedBox(
-                  height: 20,
-                ),
-                const Stack(
+                const SizedBox(height: 20),
+                Stack(
                   children: [
-                    Divider(
-                      thickness: 3,
-                    ),
-                    Divider(
-                      color: Colors.green,
-                      endIndent: 0,
-                      thickness: 3,
+                    const Divider(thickness: 3),
+                    FractionallySizedBox(
+                      widthFactor: progress,
+                      child: const Divider(
+                        color: Colors.green,
+                        thickness: 3,
+                      ),
                     ),
                   ],
                 ),
-                const SizedBox(
-                  height: 20,
-                ),
+                const SizedBox(height: 20),
                 Expanded(
                   child: ListView(
                     scrollDirection: Axis.vertical,
                     children: [
-                      TaskDone(
-                        tasks: doneTasks,
-                      ),
-                      TaskView(tasks: waitingTasks)
+                      TaskDone(tasks: doneTasks),
+                      TaskView(tasks: waitingTasks),
                     ],
                   ),
-                )
+                ),
               ],
             ),
           ],

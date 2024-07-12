@@ -30,6 +30,8 @@ class _AddtaskState extends State<Addtask> {
 
   final _titleController = TextEditingController();
   final _noteController = TextEditingController();
+  String? coTask;
+  String? coTask_id;
   DateTime? date;
   Duration? duration;
   Color color = Colors.blue;
@@ -69,7 +71,9 @@ class _AddtaskState extends State<Addtask> {
             isDone: false,
             color: color.value,
             creationDate: DateTime.now(),
-            notes: _noteController.text);
+            notes: _noteController.text,
+            coTask: coTask,
+            coTask_id: coTask_id);
 
         Task? res;
         if (widget.isEditing && widget.task != null) {
@@ -121,7 +125,14 @@ class _AddtaskState extends State<Addtask> {
             const SizedBox(height: 20),
             TitleField(controller: _titleController),
             const SizedBox(height: 20),
-            const CoTaskRow(),
+            CoTaskRow(
+              onChoosed: (uid, id) {
+                setState(() {
+                  coTask = uid;
+                  coTask_id = id;
+                });
+              },
+            ),
             const SizedBox(
               height: 10,
             ),

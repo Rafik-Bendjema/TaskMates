@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:taskmates/features/auth/presentation/provider/userProvider.dart';
 import 'package:taskmates/features/tasks/data/task.dart';
+import 'package:taskmates/features/tasks/presentation/pages/taskPage.dart';
+import 'package:taskmates/features/tasks/presentation/widgets/TaskDone.dart';
+import 'package:taskmates/features/tasks/presentation/widgets/taskView.dart';
 
 class Taskstats extends ConsumerStatefulWidget {
   const Taskstats({super.key});
@@ -109,6 +112,11 @@ class _TableEventsExampleState extends ConsumerState<Taskstats> {
       child: Column(
         children: [
           TableCalendar<Task>(
+            availableCalendarFormats: const {
+              CalendarFormat.month: 'two weeks',
+              CalendarFormat.week: 'month',
+              CalendarFormat.twoWeeks: 'week',
+            },
             firstDay: DateTime.utc(2015, 1, 1),
             lastDay: DateTime.utc(2030, 1, 1),
             focusedDay: _focusedDay,
@@ -189,27 +197,27 @@ class _TableEventsExampleState extends ConsumerState<Taskstats> {
           ValueListenableBuilder<List<Task>>(
             valueListenable: _selectedEvents,
             builder: (context, value, _) {
-              return ListView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: value.length,
-                itemBuilder: (context, index) {
-                  return Container(
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 12.0,
-                      vertical: 4.0,
+              List<Task> taskdone =
+                  value.where((element) => element.isDone == true).toList();
+              List<Task> taskNotDone =
+                  value.where((element) => element.isDone == false).toList();
+              print(taskdone.length);
+              return Consumer(builder: (context, ref, _) {
+                final nah = ref.watch(tasksProvider);
+                print(nah);
+                return Column(
+                  children: [
+                    TaskDone(
+                      tasks: taskdone,
+                      ignore: true,
                     ),
-                    decoration: BoxDecoration(
-                      border: Border.all(),
-                      borderRadius: BorderRadius.circular(12.0),
+                    TaskView(
+                      tasks: taskNotDone,
+                      ignore: true,
                     ),
-                    child: ListTile(
-                      onTap: () => print('${value[index]}'),
-                      title: Text(value[index].title),
-                    ),
-                  );
-                },
-              );
+                  ],
+                );
+              });
             },
           ),
           const SizedBox(height: 16.0), // Add spacing at the bottom

@@ -7,9 +7,10 @@ import 'package:taskmates/features/tasks/data/task.dart';
 import '../../domain/taskDb.dart';
 
 class TaskDone extends ConsumerStatefulWidget {
+  final bool ignore;
   final List<Task> tasks;
 
-  const TaskDone({super.key, required this.tasks});
+  const TaskDone({super.key, required this.tasks, this.ignore = false});
 
   @override
   _TaskDoneState createState() => _TaskDoneState();
@@ -58,56 +59,59 @@ class _TaskDoneState extends ConsumerState<TaskDone>
           ),
           AnimatedSize(
             duration: const Duration(milliseconds: 100),
-            child: Column(
-              children: [
-                if (isExtended)
-                  Column(
-                    children: [
-                      Column(
-                        children: widget.tasks.map((task) {
-                          return StatefulBuilder(
-                            builder: (context, setState) {
-                              return GestureDetector(
-                                onHorizontalDragUpdate: (details) {
-                                  setState(() {
-                                    _dragExtent = details.primaryDelta! + 20;
-                                  });
-                                },
-                                onHorizontalDragEnd: (details) async {
-                                  if (_dragExtent > 20) {
+            child: IgnorePointer(
+              ignoring: widget.ignore,
+              child: Column(
+                children: [
+                  if (isExtended)
+                    Column(
+                      children: [
+                        Column(
+                          children: widget.tasks.map((task) {
+                            return StatefulBuilder(
+                              builder: (context, setState) {
+                                return GestureDetector(
+                                  onHorizontalDragUpdate: (details) {
                                     setState(() {
-                                      _dragExtent = 0.0;
+                                      _dragExtent = details.primaryDelta! + 20;
                                     });
-                                    print('Delete ${task.title}');
-                                    Taskdb taskdb = TaskDb_impl();
-                                    task.isDone = !task.isDone;
-                                    await taskdb.editTask(task);
-                                  } else {
-                                    setState(() {
-                                      _dragExtent = 0.0;
-                                    });
-                                  }
-                                },
-                                child: Transform.translate(
-                                  offset: Offset(_dragExtent, 0),
-                                  child: TaskTile(
-                                    Color(task.color),
-                                    task.title,
-                                    task.coTask,
+                                  },
+                                  onHorizontalDragEnd: (details) async {
+                                    if (_dragExtent > 20) {
+                                      setState(() {
+                                        _dragExtent = 0.0;
+                                      });
+                                      print('Delete ${task.title}');
+                                      Taskdb taskdb = TaskDb_impl();
+                                      task.isDone = !task.isDone;
+                                      await taskdb.editTask(task);
+                                    } else {
+                                      setState(() {
+                                        _dragExtent = 0.0;
+                                      });
+                                    }
+                                  },
+                                  child: Transform.translate(
+                                    offset: Offset(_dragExtent, 0),
+                                    child: TaskTile(
+                                      Color(task.color),
+                                      task.title,
+                                      task.coTask_id,
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
-                          );
-                        }).toList(),
-                      ),
-                      const Divider(
-                        indent: 100,
-                        endIndent: 100,
-                      )
-                    ],
-                  ),
-              ],
+                                );
+                              },
+                            );
+                          }).toList(),
+                        ),
+                        const Divider(
+                          indent: 100,
+                          endIndent: 100,
+                        )
+                      ],
+                    ),
+                ],
+              ),
             ),
           )
         ]));

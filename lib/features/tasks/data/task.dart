@@ -10,12 +10,15 @@ class Task {
   bool isDone;
   final int color;
   String? coTask;
+  String? coTask_id;
+
   final String notes;
 
   Task(
       {required this.title,
       required this.date,
       this.coTask,
+      this.coTask_id,
       this.duration,
       required this.isDone,
       this.color = 4294198070,
@@ -34,6 +37,7 @@ class Task {
         date: (data['date'] as Timestamp).toDate(),
         duration: Duration(minutes: data['duration'] ?? 0),
         coTask: data['Co-task'],
+        coTask_id: data['co-task-id'],
         isDone: data['done'],
         notes: data['notes'] ?? "",
         color: data['color'],
@@ -51,7 +55,8 @@ class Task {
       'Co-task': coTask,
       'done': isDone,
       'color': color,
-      'notes': notes
+      'notes': notes,
+      'co-task-id': coTask_id
     };
   }
 }
